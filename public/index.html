@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>fastxgloebe — Shipment Consignment, Freight &amp; Live Tracking</title>
+<meta name="description" content="fastxgloebe — freight forwarding, cargo consolidation and shipment consignment with live tracking. Sea, air, road and warehousing, door to door and port to port.">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#home"><span class="brandMark">FXG</span> fastx<span class="brandAccent">gloebe</span></a>
+  <button id="menuBtn" class="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navDrawer">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+<div id="drawerOverlay" class="drawerOverlay hidden"></div>
+<aside id="navDrawer" class="drawer" aria-hidden="true" aria-label="Site menu">
+  <div class="drawerHead">
+    <span class="brandMark">FXG</span>
+    <span class="drawerTitle">Menu</span>
+    <button id="drawerClose" class="drawerClose" type="button" aria-label="Close menu">&times;</button>
+  </div>
+  <nav class="drawerNav">
+    <a href="#home">Home</a>
+    <a href="#services">Services</a>
+    <a href="#about">About Us</a>
+    <a href="#track">Tracking</a>
+    <a href="#support">Support</a>
+    <a href="#account" id="navAccount">My Account</a>
+    <a href="#admin" id="navAdmin" class="hidden">Admin</a>
+  </nav>
+  <div class="drawerFoot">
+    <p class="drawerAddr">Office 1804, Empire Heights Tower A,<br>Business Bay, Dubai, United Arab Emirates</p>
+    <p class="drawerClock">Dubai HQ · <span id="dubaiClock">--:--:--</span></p>
+    <button id="navLogout" class="btn small hidden" type="button">Log out</button>
+  </div>
+</aside>
+
+<main id="mainView">
+  <!-- HOME / HERO with rotating photo slideshow -->
+  <section id="home" class="hero">
+    <div class="heroBg" aria-hidden="true">
+      <img class="heroSlide active" src="https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?w=1600&q=80" alt="">
+      <img class="heroSlide" src="https://images.unsplash.com/photo-1605745341112-85968b19335b?w=1600&q=80" alt="" loading="lazy">
+      <img class="heroSlide" src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1600&q=80" alt="" loading="lazy">
+      <img class="heroSlide" src="https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=1600&q=80" alt="" loading="lazy">
+    </div>
+    <div class="hero-inner">
+      <p class="eyebrow">Dubai to the World · Freight Forwarding · Live Tracking</p>
+      <h1>Your goods, tracked every step of the way.</h1>
+      <p>fastxgloebe is a shipment consignment service — sea, air, road and warehousing, delivering to all countries worldwide. We receive your goods, move them across the world, and you can see exactly where they are at any time.</p>
+      <p class="heroStatus"><span class="pulseDot"></span> Operations desk live · Dubai HQ <span id="heroClock">--:--:--</span></p>
+      <a class="btn primary" href="#track">Track your consignment</a>
+      <a class="btn ghost" href="#services">Our services</a>
+      <div class="heroDots" aria-hidden="true"><span class="active"></span><span></span><span></span><span></span></div>
+    </div>
+  </section>
+
+  <div class="chips reveal" aria-label="Quick links">
+    <a class="chip" href="#services">🌊 Sea Freight</a>
+    <a class="chip" href="#services">✈️ Air Freight</a>
+    <a class="chip" href="#services">🚚 Road Freight</a>
+    <a class="chip" href="#services">🏬 Warehousing</a>
+    <a class="chip chipAccent" href="#track">📍 Track a shipment</a>
+  </div>
+
+  <section class="how reveal">
+    <h2>How tracking works</h2>
+    <ol class="steps">
+      <li><span class="stepNum">1</span><strong>Goods received</strong><span>Your shipment is booked in, a tracking code is generated automatically and a receipt is issued.</span></li>
+      <li><span class="stepNum">2</span><strong>We move it</strong><span>Sea, air or road — the location is updated at every checkpoint, and pinned on the map.</span></li>
+      <li><span class="stepNum">3</span><strong>You track it</strong><span>Enter your FXG tracking code and see the current location, timeline and map.</span></li>
+      <li><span class="stepNum">4</span><strong>Delivered</strong><span>Your goods arrive at their destination, confirmed on the timeline.</span></li>
+    </ol>
+  </section>
+
+  <!-- TRACK -->
+  <section id="track" class="panel">
+    <h2>Track Consignment</h2>
+    <p class="muted">Enter your tracking number (for example FXG-12345678). It works in any case — fxg-… is fine too.</p>
+    <form id="trackForm" class="row">
+      <input id="trackInput" type="text" placeholder="FXG-xxxxxxxx" autocomplete="off" required>
+      <button class="btn primary" type="submit">Track</button>
+    </form>
+    <div id="trackResult"></div>
+    <div id="trackMapWrap" class="mapWrap hidden">
+      <h3>Where your goods are now</h3>
+      <div id="trackMap" class="map"></div>
+      <p class="muted small">The pin is placed by our team at the latest checkpoint of your shipment.</p>
+    </div>
+  </section>
+
+  <!-- SERVICES + NVOCC WRITE-UP -->
+  <section id="services" class="panel alt">
+    <h2>Our Services</h2>
+    <div class="cards">
+      <article class="svcCard reveal"><img src="https://images.unsplash.com/photo-1494412651409-8963ce7935a7?w=900&q=80" alt="Aerial view of stacked shipping containers" loading="lazy"><div><h3>Sea Freight</h3><p>Containers, vehicles and household goods shipped by sea, port to port, with checkpoint updates at every stage.</p></div></article>
+      <article class="svcCard reveal"><img src="https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=900&q=80" alt="Cargo aircraft being prepared at an airport" loading="lazy"><div><h3>Air Freight</h3><p>Faster consignments by air for urgent and lighter shipments, with the same live tracking.</p></div></article>
+      <article class="svcCard reveal"><img src="https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=900&q=80" alt="Freight truck on the highway" loading="lazy"><div><h3>Road Freight</h3><p>Road movement and last-stage delivery to the final destination, confirmed on your timeline.</p></div></article>
+      <article class="svcCard reveal"><img src="https://images.unsplash.com/photo-1553413077-190dd305871c?w=900&q=80" alt="Organised warehouse aisles" loading="lazy"><div><h3>Warehousing</h3><p>Safe, organised storage while your goods wait for onward movement or collection.</p></div></article>
+    </div>
+
+    <div class="nvocc">
+      <div class="nvocc-text">
+        <h3>A leading Non-Vessel Operating Common Carrier (NVOCC) operator</h3>
+        <p>fastxgloebe operates as a leading Non-Vessel Operating Common Carrier (NVOCC) operator in the world. Our NVOCC business encompasses cargo consolidation and door to door / port to port sea freight forwarding services.</p>
+        <div id="nvoccMore" class="hidden">
+          <p>From less-than-container-load (LCL) consolidation to full-container (FCL) movements, our team plans the route, handles the documentation and keeps your shipment visible from the day it is booked until the day it is delivered. One tracking code, one timeline, one map — and a support team you can reach at any point of the journey.</p>
+        </div>
+        <button id="nvoccToggle" class="btn primary" type="button">Read More</button>
+      </div>
+      <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1200&q=80" alt="Logistics worker checking cargo in a warehouse" loading="lazy">
+    </div>
+    <p class="muted">fastxgloebe is a consignment and logistics service only — nothing is sold on this website.</p>
+  </section>
+
+  <!-- GLOBE BANNER SLIDER (auto-plays when scrolled into view) -->
+  <section class="sliderBand">
+    <div class="slider" data-slider data-autoplay="true">
+      <div class="slides">
+        <figure class="slide active">
+          <img src="https://images.unsplash.com/photo-1605745341112-85968b19335b?w=1600&q=80" alt="Container port at work" loading="lazy">
+          <figcaption><h3>Global Choice For Your Global Needs</h3><p>One partner for sea, air and road freight — worldwide.</p></figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="https://images.unsplash.com/photo-1587293852726-70cdb56c2866?w=1600&q=80" alt="Rows of shipping containers" loading="lazy">
+          <figcaption><h3>In Unity, We Link The Globe</h3><p>Consolidated cargo, connected routes, one clear timeline.</p></figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1600&q=80" alt="Aircraft in flight above the clouds" loading="lazy">
+          <figcaption><h3>Destination Differs, fastxgloebe Delivers</h3><p>Wherever your goods are going, we get them there — and you can watch them move.</p></figcaption>
+        </figure>
+      </div>
+      <button class="sArrow sPrev" type="button" aria-label="Previous slide">&#8249;</button>
+      <button class="sArrow sNext" type="button" aria-label="Next slide">&#8250;</button>
+      <div class="sDots"></div>
+    </div>
+  </section>
+
+  <!-- STATS (slow count-up when scrolled into view) -->
+  <section id="stats" class="statsBand reveal">
+    <div class="statBox"><span class="statNum" data-target="12000" data-suffix="+">0</span><span class="statLabel">Projects Completed</span></div>
+    <div class="statBox"><span class="statNum" data-target="4500" data-suffix="+">0</span><span class="statLabel">Clients</span></div>
+    <div class="statBox"><span class="statNum" data-target="500" data-suffix="+">0</span><span class="statLabel">Employees</span></div>
+    <div class="statBox"><span class="statNum" data-target="12" data-suffix="+">0</span><span class="statLabel">Years of Experience</span></div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="panel reveal">
+    <h2>About Us</h2>
+    <p>fastxgloebe is a freight forwarding and haulage company offering shipments worldwide. From our base in Dubai, United Arab Emirates, we move cargo for individuals and businesses — vehicles, household goods, commercial consignments and consolidated loads — by sea, air and road.</p>
+    <p>Our dedicated staff equips you with everything you need to move your cargo — delivering your shipments anywhere in the world, with honest updates at every checkpoint: a tracking code, a timeline and a map pin placed by our own team, so you always know where your goods are.</p>
+    <h3>Our Mission</h3>
+    <p>To provide shipping and logistics services which transcend the needs and expectations of our customers — safe, cost-effective and transparent from booking to delivery.</p>
+    <h3>Our Goals</h3>
+    <ul class="goals">
+      <li><strong>Transparency first</strong> — every shipment tracked, every checkpoint visible to the customer in real time.</li>
+      <li><strong>Safe handling</strong> — goods received, packed, unitized and moved as if they were our own, arriving without damage.</li>
+      <li><strong>Cost-effective routes</strong> — the right sailing, flight or road route for each budget, without cutting corners on care.</li>
+      <li><strong>Communication that never sleeps</strong> — a support team and a customer chat that answer, update and reassure at every stage.</li>
+      <li><strong>Growth with our clients</strong> — long-term relationships built on deliveries that arrive as promised, year after year.</li>
+    </ul>
+  </section>
+
+  <!-- OFFICE / TEAM PHOTO SLIDER (auto-plays when scrolled into view) -->
+  <section class="sliderBand alt">
+    <h2 class="bandTitle">Inside fastxgloebe</h2>
+    <div class="slider" data-slider data-autoplay="true">
+      <div class="slides short">
+        <figure class="slide active">
+          <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1600&q=80" alt="Our team planning shipments together" loading="lazy">
+          <figcaption><h3>Planning every route</h3><p>Operations, documentation and customer care — under one roof.</p></figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1600&q=80" alt="A customer meeting at our office" loading="lazy">
+          <figcaption><h3>Customers first</h3><p>We sit with our clients and plan the best route for their goods.</p></figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=1600&q=80" alt="Inside our warehouse" loading="lazy">
+          <figcaption><h3>Warehousing that works</h3><p>Organised storage, careful handling, ready for onward movement.</p></figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=1600&q=80" alt="A delivery being handed over" loading="lazy">
+          <figcaption><h3>Delivered, confirmed</h3><p>Final delivery confirmed on the customer's timeline.</p></figcaption>
+        </figure>
+      </div>
+      <button class="sArrow sPrev" type="button" aria-label="Previous slide">&#8249;</button>
+      <button class="sArrow sNext" type="button" aria-label="Next slide">&#8250;</button>
+      <div class="sDots"></div>
+    </div>
+  </section>
+
+  <!-- PHOTO GALLERY — auto-scrolling strip -->
+  <section class="galleryBand reveal" aria-label="Photo gallery">
+    <h2 class="bandTitle">From Port to Doorstep</h2>
+    <div class="galleryTrack">
+      <figure><img src="https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?w=800&q=80" alt="Container ship at sea" loading="lazy"><figcaption>Ocean freight</figcaption></figure>
+      <figure><img src="https://images.unsplash.com/photo-1553413077-190dd305871c?w=800&q=80" alt="Warehouse storage aisles" loading="lazy"><figcaption>Secure warehousing</figcaption></figure>
+      <figure><img src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=800&q=80" alt="Courier handing over a delivery" loading="lazy"><figcaption>Final delivery</figcaption></figure>
+      <figure><img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&q=80" alt="Partners shaking hands" loading="lazy"><figcaption>Trusted partners</figcaption></figure>
+      <figure><img src="https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=800&q=80" alt="Drone flying over a site" loading="lazy"><figcaption>Route planning</figcaption></figure>
+      <figure><img src="https://images.unsplash.com/photo-1605745341112-85968b19335b?w=800&q=80" alt="Busy container port" loading="lazy"><figcaption>Port operations</figcaption></figure>
+      <figure aria-hidden="true"><img src="https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?w=800&q=80" alt="" loading="lazy"><figcaption>Ocean freight</figcaption></figure>
+      <figure aria-hidden="true"><img src="https://images.unsplash.com/photo-1553413077-190dd305871c?w=800&q=80" alt="" loading="lazy"><figcaption>Secure warehousing</figcaption></figure>
+      <figure aria-hidden="true"><img src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=800&q=80" alt="" loading="lazy"><figcaption>Final delivery</figcaption></figure>
+      <figure aria-hidden="true"><img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&q=80" alt="" loading="lazy"><figcaption>Trusted partners</figcaption></figure>
+      <figure aria-hidden="true"><img src="https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=800&q=80" alt="" loading="lazy"><figcaption>Route planning</figcaption></figure>
+      <figure aria-hidden="true"><img src="https://images.unsplash.com/photo-1605745341112-85968b19335b?w=800&q=80" alt="" loading="lazy"><figcaption>Port operations</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- WHERE WE SHIP (popular routes — we deliver to ALL countries worldwide) -->
+  <section id="routes" class="panel reveal">
+    <h2>Where We Ship</h2>
+    <p class="muted">fastxgloebe delivers to <strong>all countries worldwide</strong>. Below are some of our most popular routes from our Dubai hub — if your country is not listed here, we ship there too.</p>
+    <div class="routeGrid">
+      <article class="routeCard"><h3>Dubai → London</h3><p>United Kingdom · London Gateway &amp; Heathrow Cargo · Sea &amp; Air</p></article>
+      <article class="routeCard"><h3>Dubai → New York</h3><p>USA · Port of New York &amp; JFK Cargo · Sea &amp; Air</p></article>
+      <article class="routeCard"><h3>Dubai → Singapore</h3><p>Singapore · Port of Singapore &amp; Changi Cargo · Sea &amp; Air</p></article>
+      <article class="routeCard"><h3>Dubai → Mumbai</h3><p>India · Nhava Sheva &amp; Mumbai Cargo · Sea &amp; Air</p></article>
+    </div>
+    <div id="routesMore" class="routeGrid hidden">
+      <article class="routeCard"><h3>Dubai → Rotterdam</h3><p>Netherlands · Port of Rotterdam · Sea &amp; Air</p></article>
+      <article class="routeCard"><h3>Dubai → Sydney</h3><p>Australia · Port Botany &amp; Sydney Cargo · Sea &amp; Air</p></article>
+      <article class="routeCard"><h3>Dubai → Toronto</h3><p>Canada · Toronto Pearson Cargo · Air &amp; Sea</p></article>
+      <article class="routeCard"><h3>Dubai → Hamburg</h3><p>Germany · Port of Hamburg · Sea &amp; Air</p></article>
+    </div>
+    <button id="routesToggle" class="btn primary" type="button" aria-expanded="false" aria-controls="routesMore">See more</button>
+  </section>
+
+  <!-- PROFESSIONAL TEAM -->
+  <section id="team" class="panel alt reveal">
+    <h2>Our Professional Team</h2>
+    <div class="teamGrid">
+      <article class="teamCard">
+        <img src="https://randomuser.me/api/portraits/men/85.jpg" alt="Portrait of Michael Carter" loading="lazy">
+        <h3>Michael Carter</h3><p>Operations Manager</p>
+      </article>
+      <article class="teamCard">
+        <img src="https://randomuser.me/api/portraits/women/50.jpg" alt="Portrait of Grace Muller" loading="lazy">
+        <h3>Grace Muller</h3><p>Assistant Manager</p>
+      </article>
+      <article class="teamCard">
+        <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Portrait of Robert Kane" loading="lazy">
+        <h3>Robert Kane</h3><p>Packaging and Unitization Manager</p>
+      </article>
+      <article class="teamCard">
+        <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="Portrait of Fatima Al Mansoori" loading="lazy">
+        <h3>Fatima Al Mansoori</h3><p>Customer Support Manager</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials" class="panel reveal">
+    <h2>What People Say</h2>
+    <div class="testiGrid">
+      <article class="testi">
+        <p>“fastxgloebe are true professionals in everything they do. I was genuinely impressed by the first-class service, and I would recommend them to any company or individual who wants to ship their goods with peace of mind.”</p>
+        <div class="testiWho"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Portrait of Sarah Mitchell" loading="lazy"><div><strong>Sarah Mitchell</strong><small>July 14, 2019</small></div></div>
+      </article>
+      <article class="testi">
+        <p>“My cars finally arrived and they are in excellent shape. The company did a very good job — they kept me informed about what was happening at every stage. Great communication, and I am thankful for that.”</p>
+        <div class="testiWho"><img src="https://randomuser.me/api/portraits/men/22.jpg" alt="Portrait of Carlos Mendes" loading="lazy"><div><strong>Carlos Mendes</strong><small>November 3, 2020</small></div></div>
+      </article>
+      <article class="testi">
+        <p>“A quick thank you to the whole staff for helping with the successful arrival of my car. The process was quick and the cost was competitive, and the car came without a single scratch. I have recommended your services to my family and friends.”</p>
+        <div class="testiWho"><img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Portrait of Elena Petrova" loading="lazy"><div><strong>Elena Petrova</strong><small>April 22, 2021</small></div></div>
+      </article>
+      <article class="testi">
+        <p>“We moved our household goods from Dubai to London with fastxgloebe. Every box was tracked, the timeline was honest, and everything arrived on the day they promised. Moving country is stressful — this part was not.”</p>
+        <div class="testiWho"><img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Portrait of James Whitfield" loading="lazy"><div><strong>James Whitfield</strong><small>September 9, 2022</small></div></div>
+      </article>
+      <article class="testi">
+        <p>“As a small business, we ship goods every month and the tracking map is a blessing. I can see exactly where my consignment is and share the same view with my own customers. No stories, just facts.”</p>
+        <div class="testiWho"><img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Portrait of Priya Sharma" loading="lazy"><div><strong>Priya Sharma</strong><small>February 17, 2024</small></div></div>
+      </article>
+      <article class="testi">
+        <p>“Support answered me on the chat the same evening I wrote, and my shipment cleared and was delivered two days later. Fair price, careful handling and proper updates — I will use them again.”</p>
+        <div class="testiWho"><img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Portrait of Thomas Greene" loading="lazy"><div><strong>Thomas Greene</strong><small>August 28, 2025</small></div></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- SUPPORT -->
+  <section id="support" class="panel alt">
+    <h2>Contact Support</h2>
+    <p class="muted">Questions about a shipment? Send a message and support will reply. If you are logged in, the reply will also show in My Account. Logged-in customers can also use the live Chat in My Account.</p>
+    <form id="supportForm" class="form">
+      <label>Your name <input id="supName" type="text" autocomplete="name"></label>
+      <label>Your email <input id="supEmail" type="email" autocomplete="email" required></label>
+      <label>Subject <input id="supSubject" type="text"></label>
+      <label>Message <textarea id="supMessage" rows="4" required></textarea></label>
+      <button class="btn primary" type="submit">Send to support</button>
+      <p id="supportMsg" class="msg"></p>
+    </form>
+  </section>
+
+  <!-- ACCOUNT -->
+  <section id="account" class="panel">
+    <h2>My Account</h2>
+    <div id="authBox">
+      <div class="tabs">
+        <button id="tabLogin" class="tab active" type="button">Log in</button>
+        <button id="tabRegister" class="tab" type="button">Register</button>
+        <button id="tabForgot" class="tab" type="button">Forgot password</button>
+      </div>
+      <form id="loginForm" class="form">
+        <label>Email <input id="loginEmail" type="email" required></label>
+        <label>Password <input id="loginPassword" type="password" required></label>
+        <button class="btn primary" type="submit">Log in</button>
+      </form>
+      <form id="registerForm" class="form hidden">
+        <label>Full name <input id="regName" type="text" required></label>
+        <label>Email <input id="regEmail" type="email" required></label>
+        <label>Phone (optional) <input id="regPhone" type="tel"></label>
+        <label>Password (min. 6 characters) <input id="regPassword" type="password" required minlength="6"></label>
+        <button class="btn primary" type="submit">Create account — send my code</button>
+        <p class="muted small">We email a 6-digit code to your real email address. Enter it below to finish creating your account.</p>
+      </form>
+      <form id="verifyForm" class="form hidden">
+        <label>Email <input id="verifyEmail" type="email" required></label>
+        <label>6-digit code from your email <input id="verifyCode" type="text" inputmode="numeric" autocomplete="one-time-code" required></label>
+        <button class="btn primary" type="submit">Verify &amp; create my account</button>
+      </form>
+      <form id="forgotForm" class="form hidden">
+        <label>Email <input id="forgotEmail" type="email" required></label>
+        <button id="forgotSendBtn" class="btn" type="button">Send reset code to my email</button>
+        <label>6-digit reset code <input id="resetCode" type="text" inputmode="numeric" autocomplete="one-time-code"></label>
+        <label>New password (min. 6 characters) <input id="resetPassword" type="password" minlength="6"></label>
+        <button class="btn primary" type="submit">Set new password</button>
+      </form>
+      <p id="authMsg" class="msg"></p>
+    </div>
+    <div id="accountBox" class="hidden">
+      <p id="accountHello"></p>
+
+      <h3>My Profile</h3>
+      <form id="profileForm" class="form grid">
+        <label>Full name <input id="pfName" type="text"></label>
+        <label>Phone <input id="pfPhone" type="tel"></label>
+        <label>Address <input id="pfAddress" type="text"></label>
+        <button class="btn primary" type="submit">Save profile</button>
+        <p id="profileMsg" class="msg"></p>
+      </form>
+      <form id="pwForm" class="form">
+        <label>Current password <input id="pwCurrent" type="password"></label>
+        <label>New password (min. 6 characters) <input id="pwNew" type="password" minlength="6"></label>
+        <button class="btn" type="submit">Change password</button>
+        <p id="pwMsg" class="msg"></p>
+      </form>
+
+      <h3>My consignments</h3>
+      <div id="myConsignments"></div>
+
+      <h3>Chat with us</h3>
+      <div id="chatThread" class="chatThread"></div>
+      <form id="chatForm" class="row">
+        <input id="chatInput" type="text" placeholder="Write a message to the fastxgloebe team…" autocomplete="off" required>
+        <button class="btn primary" type="submit">Send</button>
+      </form>
+
+      <h3>My support messages</h3>
+      <div id="mySupport"></div>
+    </div>
+  </section>
+
+  <!-- ADMIN -->
+  <section id="admin" class="panel alt hidden">
+    <h2>Admin Panel</h2>
+    <div id="adminStats" class="cards"></div>
+
+    <h3>Book a package — create a consignment</h3>
+    <p class="muted small">The tracking code is generated automatically when you book, and a receipt is created with it.</p>
+    <form id="createForm" class="form grid">
+      <label>Customer email * <input id="cEmail" type="email" required></label>
+      <label>Customer name <input id="cName" type="text"></label>
+      <label>Sender name <input id="cSender" type="text"></label>
+      <label>Origin <input id="cOrigin" type="text"></label>
+      <label>Destination <input id="cDest" type="text"></label>
+      <label>Weight <input id="cWeight" type="text" placeholder="e.g. 120 kg"></label>
+      <label>Description <input id="cDesc" type="text"></label>
+      <label>Starting status
+        <select id="cStatus">
+          <option>Received</option><option>In Transit</option><option>At Warehouse</option>
+          <option>Out for Delivery</option><option>Delivered</option><option>On Hold</option>
+        </select></label>
+      <label>Current location <input id="cLocation" type="text"></label>
+      <label>Note <input id="cNote" type="text"></label>
+      <button class="btn primary" type="submit">Book package</button>
+      <p id="createMsg" class="msg"></p>
+    </form>
+
+    <h3>All consignments — update goods location &amp; map pin</h3>
+    <div id="adminConsignments"></div>
+
+    <h3>Customer Chat Portal</h3>
+    <p class="muted small">Chats from customers' accounts land here. Pick a customer, read the thread and reply.</p>
+    <div id="adminChat"></div>
+
+    <h3>Support Inbox Portal</h3>
+    <p class="muted small">Every Contact Support message drops into this inbox.</p>
+    <div id="adminSupport"></div>
+
+    <h3>Customers</h3>
+    <div id="adminCustomers"></div>
+  </section>
+</main>
+
+<!-- RECEIPT VIEW (screenshot-ready: receipt alone on the page) -->
+<section id="receiptView" class="hidden">
+  <div class="receiptTools">
+    <button id="receiptBack" class="btn" type="button">&#8249; Back to Admin</button>
+    <button id="receiptPrint" class="btn primary" type="button">Print / Save receipt</button>
+  </div>
+  <h3 class="receiptFillTitle">Fill the receipt</h3>
+  <form id="receiptForm" class="form grid receiptFill">
+    <label>Sender name <input id="rSender" type="text"></label>
+    <label>Receiver name <input id="rReceiver" type="text"></label>
+    <label>Receiver email <input id="rEmail" type="email"></label>
+    <label>Origin <input id="rOrigin" type="text"></label>
+    <label>Destination <input id="rDest" type="text"></label>
+    <label>Description of goods <input id="rDesc" type="text"></label>
+    <label>Weight <input id="rWeight" type="text"></label>
+    <label>Pieces <input id="rPieces" type="text"></label>
+    <label>Charges (details) <input id="rCharges" type="text" placeholder="e.g. Freight 450, Handling 50"></label>
+    <label>Total <input id="rTotal" type="text" placeholder="e.g. 500"></label>
+    <label>Currency <input id="rCurrency" type="text"></label>
+    <label>Date <input id="rDate" type="date"></label>
+    <label>Note <input id="rNote" type="text"></label>
+    <button class="btn primary" type="submit">Save receipt</button>
+    <p id="receiptMsg" class="msg"></p>
+  </form>
+  <div id="receiptCard" class="receiptCard"></div>
+  <p class="muted small receiptHint">Tip: after saving, use “Print / Save receipt” — or take a screenshot of the receipt card above. On paper/PDF only the receipt prints.</p>
+</section>
+
+<footer id="siteFooter">
+  <div class="footGrid">
+    <div class="footCol">
+      <p class="footBrand">FASTXGLOEBE</p>
+      <p>fastxgloebe is a Freight Forwarding and Haulage Company offering shipments worldwide.</p>
+      <p>Our dedicated staff equips you with everything you need to move your cargo — delivering your shipments anywhere in the world.</p>
+      <div class="socials">
+        <a href="#" aria-label="Facebook">f</a>
+        <a href="#" aria-label="Twitter / X">X</a>
+        <a href="#" aria-label="Google Plus">G+</a>
+        <a href="#" aria-label="Instagram">IG</a>
+      </div>
+    </div>
+    <div class="footCol">
+      <h4>Quick Links</h4>
+      <ul class="footLinks">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#support">Contact Us</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#track">Tracking</a></li>
+      </ul>
+    </div>
+    <div class="footCol">
+      <h4>Get in Touch</h4>
+      <!-- PLACEHOLDER ADDRESS: replace with the real Dubai office address before relying on it publicly. -->
+      <p>Office 1804, Empire Heights Tower A,<br>Business Bay, Dubai,<br>United Arab Emirates</p>
+      <!-- PLACEHOLDER PHONE: replace with the real business number. -->
+      <p class="footPhone">+971 4 524 8091</p>
+      <p><a href="mailto:info@fastxgloebe.com">info@fastxgloebe.com</a></p>
+    </div>
+  </div>
+  <p class="footBase">&copy; 2026 fastxgloebe. All rights reserved.</p>
+</footer>
+
+<button id="toTop" class="toTop hidden" type="button" aria-label="Back to top">↑</button>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: fastxgloebe
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      # Email codes (registration verification + password reset) via Brevo.
+      # OTP_MODE MUST be "live" in production so codes land in real inboxes.
+      - key: OTP_MODE
+        value: live
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_SENDER_EMAIL
+        sync: false
