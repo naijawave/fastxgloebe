@@ -120,6 +120,16 @@ async function registerVerified(name, email, password, phone) {
     check('app.js has routes See more/See less toggle logic (Change 9)',
       appJs.includes('routesToggle') && appJs.includes('See less') && appJs.includes('routesMore'));
 
+    /* ---- Change 10: dedicated Track + Messages views, richer menu ---- */
+    check('Change 10: dedicated Track + Messages views present',
+      home.includes('id="trackView"') && home.includes('id="messagesView"') && home.includes('id="trackBack"') && home.includes('id="messagesBack"'));
+    check('Change 10: menu has Track Consignment + Messages entries and a topbar Track button',
+      home.includes('data-open="track"') && home.includes('data-open="messages"') && home.includes('id="topTrackBtn"') && home.includes('Track Consignment'));
+    check('Change 10: chat + support replies live in the Messages view (not buried in Account)',
+      home.includes('id="messagesBody"') && home.includes('id="chatThread"') && home.includes('id="mySupport"') && home.includes('id="accountMessagesBtn"'));
+    check('Change 10: app.js has view switching logic',
+      appJs.includes('openView') && appJs.includes('showMainView') && appJs.includes('refreshMessagesVisibility'));
+
     /* ---- Auth: email-code registration (Change 7) ---- */
     const reg1 = await req('POST', '/api/auth/register', { name: 'Owner One', email: 'owner@example.com', password: 'secret1' });
     check('register user1 returns pending + dev_code (201)', reg1.status === 201 && reg1.data.pending === true && /^\d{6}$/.test(reg1.data.dev_code || ''), JSON.stringify(reg1.data));

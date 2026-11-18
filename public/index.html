@@ -11,9 +11,12 @@
 <body>
 <header class="topbar">
   <a class="brand" href="#home"><span class="brandMark">FXG</span> fastx<span class="brandAccent">gloebe</span></a>
-  <button id="menuBtn" class="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navDrawer">
-    <span></span><span></span><span></span>
-  </button>
+  <div class="topActions">
+    <button id="topTrackBtn" class="btn small primary" type="button">📍 Track</button>
+    <button id="menuBtn" class="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navDrawer">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
 </header>
 <div id="drawerOverlay" class="drawerOverlay hidden"></div>
 <aside id="navDrawer" class="drawer" aria-hidden="true" aria-label="Site menu">
@@ -24,10 +27,12 @@
   </div>
   <nav class="drawerNav">
     <a href="#home">Home</a>
+    <a href="#track" data-open="track">Track Consignment</a>
+    <a href="#messages" data-open="messages">Messages</a>
     <a href="#services">Services</a>
+    <a href="#routes">Where We Ship</a>
     <a href="#about">About Us</a>
-    <a href="#track">Tracking</a>
-    <a href="#support">Support</a>
+    <a href="#support">Contact Support</a>
     <a href="#account" id="navAccount">My Account</a>
     <a href="#admin" id="navAdmin" class="hidden">Admin</a>
   </nav>
@@ -52,7 +57,7 @@
       <h1>Your goods, tracked every step of the way.</h1>
       <p>fastxgloebe is a shipment consignment service — sea, air, road and warehousing, delivering to all countries worldwide. We receive your goods, move them across the world, and you can see exactly where they are at any time.</p>
       <p class="heroStatus"><span class="pulseDot"></span> Operations desk live · Dubai HQ <span id="heroClock">--:--:--</span></p>
-      <a class="btn primary" href="#track">Track your consignment</a>
+      <a class="btn primary" href="#track" data-open="track">Track your consignment</a>
       <a class="btn ghost" href="#services">Our services</a>
       <div class="heroDots" aria-hidden="true"><span class="active"></span><span></span><span></span><span></span></div>
     </div>
@@ -63,7 +68,7 @@
     <a class="chip" href="#services">✈️ Air Freight</a>
     <a class="chip" href="#services">🚚 Road Freight</a>
     <a class="chip" href="#services">🏬 Warehousing</a>
-    <a class="chip chipAccent" href="#track">📍 Track a shipment</a>
+    <a class="chip chipAccent" href="#track" data-open="track">📍 Track a shipment</a>
   </div>
 
   <section class="how reveal">
@@ -74,22 +79,6 @@
       <li><span class="stepNum">3</span><strong>You track it</strong><span>Enter your FXG tracking code and see the current location, timeline and map.</span></li>
       <li><span class="stepNum">4</span><strong>Delivered</strong><span>Your goods arrive at their destination, confirmed on the timeline.</span></li>
     </ol>
-  </section>
-
-  <!-- TRACK -->
-  <section id="track" class="panel">
-    <h2>Track Consignment</h2>
-    <p class="muted">Enter your tracking number (for example FXG-12345678). It works in any case — fxg-… is fine too.</p>
-    <form id="trackForm" class="row">
-      <input id="trackInput" type="text" placeholder="FXG-xxxxxxxx" autocomplete="off" required>
-      <button class="btn primary" type="submit">Track</button>
-    </form>
-    <div id="trackResult"></div>
-    <div id="trackMapWrap" class="mapWrap hidden">
-      <h3>Where your goods are now</h3>
-      <div id="trackMap" class="map"></div>
-      <p class="muted small">The pin is placed by our team at the latest checkpoint of your shipment.</p>
-    </div>
   </section>
 
   <!-- SERVICES + NVOCC WRITE-UP -->
@@ -287,7 +276,7 @@
   <!-- SUPPORT -->
   <section id="support" class="panel alt">
     <h2>Contact Support</h2>
-    <p class="muted">Questions about a shipment? Send a message and support will reply. If you are logged in, the reply will also show in My Account. Logged-in customers can also use the live Chat in My Account.</p>
+    <p class="muted">Questions about a shipment? Send a message and support will reply. If you are logged in, the reply will also show in <strong>Messages</strong> — where logged-in customers can also chat live with our team.</p>
     <form id="supportForm" class="form">
       <label>Your name <input id="supName" type="text" autocomplete="name"></label>
       <label>Your email <input id="supEmail" type="email" autocomplete="email" required></label>
@@ -355,15 +344,11 @@
       <h3>My consignments</h3>
       <div id="myConsignments"></div>
 
-      <h3>Chat with us</h3>
-      <div id="chatThread" class="chatThread"></div>
-      <form id="chatForm" class="row">
-        <input id="chatInput" type="text" placeholder="Write a message to the fastxgloebe team…" autocomplete="off" required>
-        <button class="btn primary" type="submit">Send</button>
-      </form>
-
-      <h3>My support messages</h3>
-      <div id="mySupport"></div>
+      <h3>Messages</h3>
+      <div class="item">
+        <p>Chat with the fastxgloebe team and read replies to your support messages — all in one place, under <strong>Messages</strong> in the menu.</p>
+        <button id="accountMessagesBtn" class="btn primary" type="button">Open Messages</button>
+      </div>
     </div>
   </section>
 
@@ -408,6 +393,53 @@
     <div id="adminCustomers"></div>
   </section>
 </main>
+
+<!-- TRACK VIEW — tracking has its own page, opened from the menu (Change 10) -->
+<section id="trackView" class="viewPage hidden">
+  <div class="viewTools">
+    <button id="trackBack" class="btn" type="button">&#8249; Back</button>
+  </div>
+  <section id="track" class="panel">
+    <h2>Track Consignment</h2>
+    <p class="muted">Enter your tracking number (for example FXG-12345678). It works in any case — fxg-… is fine too.</p>
+    <form id="trackForm" class="row">
+      <input id="trackInput" type="text" placeholder="FXG-xxxxxxxx" autocomplete="off" required>
+      <button class="btn primary" type="submit">Track</button>
+    </form>
+    <div id="trackResult"></div>
+    <div id="trackMapWrap" class="mapWrap hidden">
+      <h3>Where your goods are now</h3>
+      <div id="trackMap" class="map"></div>
+      <p class="muted small">The pin is placed by our team at the latest checkpoint of your shipment.</p>
+    </div>
+  </section>
+</section>
+
+<!-- MESSAGES VIEW — customer chat + support replies in one place (Change 10) -->
+<section id="messagesView" class="viewPage hidden">
+  <div class="viewTools">
+    <button id="messagesBack" class="btn" type="button">&#8249; Back</button>
+  </div>
+  <section class="panel">
+    <h2>Messages</h2>
+    <div id="messagesLoginHint" class="hidden">
+      <p class="muted">Log in or create an account to chat with the fastxgloebe team and to see replies to your support messages — everything in this one place.</p>
+      <button id="messagesLoginBtn" class="btn primary" type="button">Log in / Register</button>
+    </div>
+    <div id="messagesBody" class="hidden">
+      <h3>Chat with us</h3>
+      <div id="chatThread" class="chatThread"></div>
+      <form id="chatForm" class="row">
+        <input id="chatInput" type="text" placeholder="Write a message to the fastxgloebe team…" autocomplete="off" required>
+        <button class="btn primary" type="submit">Send</button>
+      </form>
+
+      <h3>My support messages</h3>
+      <p class="muted small">Messages you sent through Contact Support, with our replies.</p>
+      <div id="mySupport"></div>
+    </div>
+  </section>
+</section>
 
 <!-- RECEIPT VIEW (screenshot-ready: receipt alone on the page) -->
 <section id="receiptView" class="hidden">
@@ -457,7 +489,7 @@
         <li><a href="#about">About Us</a></li>
         <li><a href="#support">Contact Us</a></li>
         <li><a href="#services">Services</a></li>
-        <li><a href="#track">Tracking</a></li>
+        <li><a href="#track" data-open="track">Tracking</a></li>
       </ul>
     </div>
     <div class="footCol">

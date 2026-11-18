@@ -24,6 +24,7 @@ h1,h2,h3{color:var(--ink)}
 .brand{color:var(--pine);text-decoration:none;font-weight:900;font-size:1.3rem;letter-spacing:.3px;display:inline-flex;align-items:center;gap:.55rem}
 .brandAccent{color:var(--lime-deep)}
 .brandMark{display:inline-flex;align-items:center;justify-content:center;background:var(--pine);color:var(--lime);font-size:.82rem;font-weight:900;letter-spacing:1px;border-radius:10px;padding:.42rem .5rem;box-shadow:inset 0 0 0 2px rgba(201,241,111,.35)}
+.topActions{display:flex;align-items:center;gap:.55rem}
 .menuBtn{display:inline-flex;flex-direction:column;justify-content:center;gap:5px;width:46px;height:42px;padding:0 11px;background:var(--pine);border:none;border-radius:12px;cursor:pointer}
 .menuBtn span{display:block;height:3px;border-radius:2px;background:var(--lime);transition:transform .25s ease,opacity .25s ease}
 .menuBtn:hover{background:var(--pine2)}
@@ -236,6 +237,11 @@ footer{background:var(--pine-dark);color:#dcebd2;margin-top:2.5rem}
 .footCol a{color:var(--lime)}
 .footBase{max-width:1120px;margin:0 auto;padding:0 1rem 1.6rem;color:#9db8a4;font-size:.9rem}
 
+/* ---------- dedicated views: Track + Messages (Change 10) ---------- */
+.viewPage{max-width:1120px;margin:0 auto;padding:1.2rem 1rem 3rem}
+.viewPage .panel{margin-top:1rem}
+.viewTools{display:flex;gap:.6rem;flex-wrap:wrap}
+
 /* ---------- receipt ---------- */
 #receiptView{max-width:860px;margin:0 auto;padding:1.2rem 1rem 3rem}
 .receiptTools{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem}
@@ -254,7 +260,7 @@ footer{background:var(--pine-dark);color:#dcebd2;margin-top:2.5rem}
 
 @media print{
   body{background:#fff}
-  .topbar,.drawer,.drawerOverlay,#mainView,#siteFooter,.receiptTools,.receiptFill,.receiptFillTitle,.receiptHint,.toTop{display:none!important}
+  .topbar,.drawer,.drawerOverlay,#mainView,#siteFooter,#trackView,#messagesView,.receiptTools,.receiptFill,.receiptFillTitle,.receiptHint,.toTop{display:none!important}
   #receiptView{max-width:none;padding:0}
   .receiptCard{box-shadow:none;border:2px solid #000;margin:0}
 }

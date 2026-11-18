@@ -141,6 +141,7 @@ function consignmentHtml(c, { admin = false } = {}) {
     <li><strong>${esc(e.status)}</strong> — ${esc(e.location || '')}
       ${e.note ? `<div>${esc(e.note)}</div>` : ''}
       <small>${fmtDate(e.created_at)}</small></li>`).join('');
+  const custBtn = admin ? '' : `<p style="margin-top:.7rem"><button class="btn small primary custTrackBtn" type="button" data-code="${esc(c.tracking_number)}">📍 Track on map</button></p>`;
   let adminForm = '';
   if (admin) {
     adminForm = `
@@ -173,6 +174,7 @@ function consignmentHtml(c, { admin = false } = {}) {
       ${c.customer_email ? `Customer: ${esc(c.customer_email)}` : ''}
     </p>
     ${events ? `<ul class="timeline">${events}</ul>` : ''}
+    ${custBtn}
     ${adminForm}
   </div>`;
 }
@@ -225,7 +227,7 @@ $('supportForm').addEventListener('submit', async (e) => {
     await api('/api/support', { method: 'POST', body: JSON.stringify({
       name: $('supName').value, email: $('supEmail').value,
       subject: $('supSubject').value, message: $('supMessage').value }) });
-    msg.className = 'msg ok'; msg.textContent = 'Message sent. Support will reply to your email / My Account.';
+    msg.className = 'msg ok'; msg.textContent = 'Message sent. Support will reply to your email and in Messages.';
     e.target.reset(); if (me) { $('supEmail').value = me.email; loadMySupport(); }
   } catch (err) { msg.className = 'msg err'; msg.textContent = err.message; }
 });
@@ -307,6 +309,7 @@ async function refreshSessionUI() {
   $('navLogout').classList.toggle('hidden', !me);
   $('authBox').classList.toggle('hidden', !!me);
   $('accountBox').classList.toggle('hidden', !me);
+  refreshMessagesVisibility();
   if (me) {
     $('accountHello').innerHTML = `Logged in as <strong>${esc(me.name)}</strong> (${esc(me.email)})${isAdmin ? ' — <span class="badge">Admin</span>' : ''}`;
     $('supEmail').value = me.email; $('supName').value = me.name;
@@ -576,14 +579,14 @@ async function openReceipt(id) {
     renderReceiptCard(receipt);
     $('mainView').classList.add('hidden');
     $('siteFooter').classList.add('hidden');
+    $('trackView').classList.add('hidden');
+    $('messagesView').classList.add('hidden');
     $('receiptView').classList.remove('hidden');
     window.scrollTo(0, 0);
   } catch (err) { alert(err.message); }
 }
 function closeReceipt() {
-  $('receiptView').classList.add('hidden');
-  $('mainView').classList.remove('hidden');
-  $('siteFooter').classList.remove('hidden');
+  showMainView();
   location.hash = '#admin';
 }
 $('receiptBack').addEventListener('click', closeReceipt);
@@ -603,5 +606,66 @@ $('receiptForm').addEventListener('submit', async (e) => {
   } catch (err) { msg.className = 'msg err'; msg.textContent = err.message; }
 });
 
+/* ---------- Dedicated views: Track + Messages (Change 10) ---------- */
+function showMainView() {
+  $('trackView').classList.add('hidden');
+  $('messagesView').classList.add('hidden');
+  $('receiptView').classList.add('hidden');
+  $('mainView').classList.remove('hidden');
+  $('siteFooter').classList.remove('hidden');
+}
+function refreshMessagesVisibility() {
+  const hint = $('messagesLoginHint'), body = $('messagesBody');
+  if (!hint || !body) return;
+  hint.classList.toggle('hidden', !!me);
+  body.classList.toggle('hidden', !me);
+}
+function openView(view) {
+  $('mainView').classList.add('hidden');
+  $('siteFooter').classList.add('hidden');
+  $('receiptView').classList.add('hidden');
+  $('trackView').classList.toggle('hidden', view !== 'track');
+  $('messagesView').classList.toggle('hidden', view !== 'messages');
+  window.scrollTo(0, 0);
+  if (view === 'messages') {
+    refreshMessagesVisibility();
+    if (me) { loadMyChat(); loadMySupport(); }
+  }
+}
+function goView(view) {
+  openView(view);
+  history.pushState(null, '', view === 'track' ? '#track' : '#messages');
+}
+document.querySelectorAll('[data-open]').forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); goView(a.dataset.open); }));
+$('topTrackBtn').addEventListener('click', () => goView('track'));
+$('trackBack').addEventListener('click', () => { showMainView(); history.pushState(null, '', '#home'); });
+$('messagesBack').addEventListener('click', () => { showMainView(); history.pushState(null, '', '#home'); });
+$('messagesLoginBtn').addEventListener('click', () => { showMainView(); location.hash = '#account'; });
+$('accountMessagesBtn').addEventListener('click', () => goView('messages'));
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.custTrackBtn');
+  if (!b) return;
+  goView('track');
+  $('trackInput').value = b.dataset.code || '';
+  const f = $('trackForm');
+  if (f.requestSubmit) f.requestSubmit();
+  else f.dispatchEvent(new Event('submit', { cancelable: true }));
+});
+window.addEventListener('hashchange', () => {
+  const h = location.hash;
+  if (h === '#track') return openView('track');
+  if (h === '#messages') return openView('messages');
+  const viewOpen = !$('trackView').classList.contains('hidden') || !$('messagesView').classList.contains('hidden') || !$('receiptView').classList.contains('hidden');
+  if (viewOpen) {
+    showMainView();
+    if (h && h.length > 1) {
+      const el = document.getElementById(h.slice(1));
+      if (el) setTimeout(() => el.scrollIntoView(), 40);
+    } else window.scrollTo(0, 0);
+  }
+});
+
 /* ---------- Boot ---------- */
 refreshSessionUI();
+if (location.hash === '#track') openView('track');
+else if (location.hash === '#messages') openView('messages');
