@@ -143,6 +143,23 @@ class PgStore {
     this.pool = new Pool({ connectionString, ssl: { rejectUnauthorized: false } });
   }
   async init() {
+    // Retry for up to ~3 minutes: right after a Supabase password reset the
+    // pooler can briefly reject the new password (28P01) while it propagates,
+    // and a single failed attempt should not kill the deploy.
+    const attempts = 18;
+    for (let i = 1; i <= attempts; i++) {
+      try {
+        await this._initOnce();
+        if (i > 1) console.log(`[fastxgloebe] Postgres connected on attempt ${i}.`);
+        return;
+      } catch (e) {
+        console.error(`[fastxgloebe] Postgres connect attempt ${i}/${attempts} failed: ${e.code || ''} ${e.message || e}`);
+        if (i === attempts) throw e;
+        await new Promise((r) => setTimeout(r, 10000));
+      }
+    }
+  }
+  async _initOnce() {
     await this.pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
@@ -329,8 +346,14 @@ class PgStore {
 
 function createStore() {
   if (process.env.DATABASE_URL) {
+    // Pasting a long connection string on a phone can smuggle in line breaks
+    // or spaces (e.g. a break inside the hostname -> DNS ENOTFOUND). The URL
+    // never legitimately contains whitespace, so strip it all.
+    const raw = process.env.DATABASE_URL;
+    const clean = raw.replace(/\s+/g, '');
+    if (clean !== raw) console.log('[fastxgloebe] DATABASE_URL contained whitespace/breaks — cleaned automatically.');
     console.log('[fastxgloebe] Storage: Postgres (DATABASE_URL set) — data persists.');
-    return new PgStore(process.env.DATABASE_URL);
+    return new PgStore(clean);
   }
   const file = process.env.DATA_FILE || path.join(__dirname, '..', 'data', 'db.json');
   console.log(`[fastxgloebe] Storage: JSON file dev mode (${file}) — no DATABASE_URL set. Set DATABASE_URL in production so data persists on Render.`);

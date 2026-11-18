@@ -470,5 +470,5 @@ async function start() {
   console.log(`[fastxgloebe] Email mode: ${OTP_LIVE() ? 'LIVE (Brevo) — codes go to real inboxes' : 'DEV — codes are logged/returned by the API only. Set OTP_MODE=live for production.'}`);
   app.listen(PORT, () => console.log(`[fastxgloebe] Listening on port ${PORT}`));
 }
-if (require.main === module) start().catch((e) => { console.error(e); process.exit(1); });
+if (require.main === module) start().catch((e) => { console.error(`[fastxgloebe] Startup failed: ${e.code || ''} ${e.message || e}`); console.error(e); process.exit(1); });
 module.exports = { app, start };
